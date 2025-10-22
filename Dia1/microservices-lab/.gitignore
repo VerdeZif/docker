@@ -1,0 +1,37 @@
+# Archivos de entorno
+.env
+
+
+# Carpetas de dependencias
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos temporales de Python
+*.log
+*.sqlite3
+
+# Entornos virtuales
+venv/
+.env/
+env/
+.venv/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Docker
+*.pid
+*.sock
+*.pid.lock
+
+# Archivos y carpetas de compilación de React
+frontend/build/
+frontend/node_modules/
+
+# Archivos de VSCode
+.vscode/
+.idea/
