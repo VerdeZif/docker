@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: Email Service API
+  version: 1.0.0
+  description: API para enviar mensajes de contacto y notificaciones internas mediante cola con Celery.
+
+servers:
+  - url: http://localhost:8002
+    description: Local Development Server
+
+paths:
+
+  /api/contact/:
+    post:
+      summary: Enviar un mensaje desde el formulario de contacto
+      description: El mensaje se registra en la base de datos y se encola para enviar correo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - message
+              properties:
+                name:
+                  type: string
+                  example: Juan Pérez
+                email:
+                  type: string
+                  format: email
+                  example: usuario@gmail.com
+                message:
+                  type: string
+                  example: Hola, quiero más información.
+      responses:
+        '201':
+          description: Mensaje recibido y encolado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: queued
+
+  /api/notify/:
+    post:
+      summary: Enviar una notificación interna
+      description: Endpoint usado por otros servicios. El correo se encola y se registra en logs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+                - subject
+                - body
+              properties:
+                to:
+                  type: string
+                  format: email
+                  example: admin@empresa.com
+                subject:
+                  type: string
+                  example: Notificación de Pedido
+                body:
+                  type: string
+                  example: Se realizó un nuevo pedido en la tienda.
+      responses:
+        '200':
+          description: Notificación registrada y encolada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: queued
+
+  /healthz/:
+    get:
+      summary: Verifica el estado del servicio
+      responses:
+        '200':
+          description: Servicio funcionando
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: Error interno del servidor
