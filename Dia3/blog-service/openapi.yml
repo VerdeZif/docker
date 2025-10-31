@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: Blog API
+  version: 1.0.0
+  description: API pública de blog con posts, categorías, búsqueda y caché en Redis.
+
+servers:
+  - url: http://localhost:8001/api
+
+paths:
+  /posts/:
+    get:
+      summary: Listar posts con paginación y búsqueda
+      description: Retorna una lista de posts. Permite filtrar usando `search` y controlar la página con `page`.
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Texto a buscar en el título o contenido.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Número de página.
+      responses:
+        '200':
+          description: Lista paginada de posts
+          content:
+            application/json:
+              example:
+                count: 25
+                next: http://localhost:8001/api/posts/?page=2
+                previous: null
+                results:
+                  - id: 1
+                    title: "Primer post"
+                    category: "Desarrollo"
+                    created_at: "2025-10-25T15:23:00Z"
+
+  /posts/{id}/:
+    get:
+      summary: Obtener detalle de un post
+      description: Este endpoint está cacheado en Redis.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalle de un post
+          content:
+            application/json:
+              example:
+                id: 1
+                title: "Primer post"
+                content: "Contenido del post"
+                category: "Desarrollo"
+                created_at: "2025-10-25T15:23:00Z"
+        '404':
+          description: Post no encontrado
+
+  /categories/:
+    get:
+      summary: Listar categorías
+      description: Lista de categorías cacheada en Redis.
+      responses:
+        '200':
+          description: Lista de categorías
+          content:
+            application/json:
+              example:
+                - id: 1
+                  name: "Desarrollo"
+                - id: 2
+                  name: "DevOps"
+
+  /health/:
+    get:
+      summary: Healthcheck del servicio
+      description: Verifica conexión con base de datos y Redis.
+      responses:
+        '200':
+          description: Estado del sistema
+          content:
+            application/json:
+              example:
+                database: "ok"
+                redis: "ok"
+                status: "ok"
